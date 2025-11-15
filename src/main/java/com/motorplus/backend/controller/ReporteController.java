@@ -1,11 +1,11 @@
 package com.motorplus.backend.controller;
 
+import com.motorplus.backend.dao.ReporteDAO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -13,56 +13,56 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class ReporteController {
 
-    // TODO: La Persona 3 debe inyectar un 'ReporteService' aquí
-    // y crear 10 endpoints que llamen a consultas SQL.
+    private ReporteDAO reporteDAO = new ReporteDAO();
 
     @GetMapping("/simple/clientes")
-    public ResponseEntity<Object> getReporteClientes() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Listado de Clientes..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteClientes() {
+        return ResponseEntity.ok(reporteDAO.getReporteClientes());
     }
 
     @GetMapping("/simple/mecanicos")
-    public ResponseEntity<Object> getReporteMecanicos() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Listado de Mecánicos..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteMecanicos() {
+        return ResponseEntity.ok(reporteDAO.getReporteMecanicos());
     }
 
     @GetMapping("/simple/inventario")
-    public ResponseEntity<Object> getReporteInventario() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Inventario de Repuestos..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteInventario() {
+        return ResponseEntity.ok(reporteDAO.getReporteInventario());
     }
 
     @GetMapping("/intermedio/ordenes-mes")
-    public ResponseEntity<Object> getReporteOrdenesMes() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Órdenes del mes..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteOrdenesMes() {
+        LocalDate now = LocalDate.now();
+        return ResponseEntity.ok(reporteDAO.getReporteOrdenesMes(now.getYear(), now.getMonthValue()));
     }
 
     @GetMapping("/intermedio/facturas-pendientes")
-    public ResponseEntity<Object> getReporteFacturasPendientes() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Facturas pendientes de pago..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteFacturasPendientes() {
+        return ResponseEntity.ok(reporteDAO.getReporteFacturasPendientes());
     }
 
     @GetMapping("/intermedio/repuestos-usados")
-    public ResponseEntity<Object> getReporteRepuestosUsados() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Repuestos más usados..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteRepuestosUsados() {
+        return ResponseEntity.ok(reporteDAO.getReporteRepuestosUsados());
     }
 
-    @GetMapping("/intermedio/historial-vehiculo")
-    public ResponseEntity<Object> getReporteHistorialVehiculo() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Historial de un vehículo..."));
+    @GetMapping("/intermedio/historial-vehiculo/{placa}")
+    public ResponseEntity<List<Map<String, Object>>> getReporteHistorialVehiculo(@PathVariable String placa) {
+        return ResponseEntity.ok(reporteDAO.getReporteHistorialVehiculo(placa));
     }
 
     @GetMapping("/complejo/ventas-mes")
-    public ResponseEntity<Object> getReporteVentasMes() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Gráfico Ventas por Mes..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteVentasMes() {
+        return ResponseEntity.ok(reporteDAO.getReporteVentasMes());
     }
 
     @GetMapping("/complejo/mecanicos-productivos")
-    public ResponseEntity<Object> getReporteMecanicosProductivos() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Gráfico Top 5 Mecánicos..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteMecanicosProductivos() {
+        return ResponseEntity.ok(reporteDAO.getReporteMecanicosProductivos());
     }
 
     @GetMapping("/complejo/servicios-populares")
-    public ResponseEntity<Object> getReporteServiciosPopulares() {
-        return ResponseEntity.ok(Map.of("reporte", "Pendiente: Gráfico Servicios más solicitados..."));
+    public ResponseEntity<List<Map<String, Object>>> getReporteServiciosPopulares() {
+        return ResponseEntity.ok(reporteDAO.getReporteServiciosPopulares());
     }
 }

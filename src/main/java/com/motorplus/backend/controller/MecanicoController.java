@@ -1,8 +1,7 @@
 package com.motorplus.backend.controller;
 
+import com.motorplus.backend.dao.MecanicoDAO;
 import com.motorplus.backend.entity.Mecanico;
-import com.motorplus.backend.repository.MecanicoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,46 +12,33 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class MecanicoController {
 
-    @Autowired
-    private MecanicoRepository repository;
+    private MecanicoDAO mecanicoDAO = new MecanicoDAO();
 
     @GetMapping
     public List<Mecanico> getAll() {
-        return repository.findAll();
+        return mecanicoDAO.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Mecanico> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Mecanico mecanico = mecanicoDAO.findById(id);
+        return (mecanico != null) ? ResponseEntity.ok(mecanico) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
     public Mecanico create(@RequestBody Mecanico mecanico) {
-        return repository.save(mecanico);
+        return mecanicoDAO.save(mecanico);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Mecanico> update(@PathVariable Long id, @RequestBody Mecanico details) {
-        return repository.findById(id)
-                .map(existing -> {
-                    existing.setNombres(details.getNombres());
-                    existing.setApellidos(details.getApellidos());
-                    existing.setDocumento(details.getDocumento());
-                    existing.setEspecialidad(details.getEspecialidad());
-                    return ResponseEntity.ok(repository.save(existing));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Mecanico updated = mecanicoDAO.update(id, details);
+        return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(existing -> {
-                    repository.delete(existing);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        boolean success = mecanicoDAO.deleteById(id);
+        return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }

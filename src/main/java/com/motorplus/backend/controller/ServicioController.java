@@ -1,8 +1,7 @@
 package com.motorplus.backend.controller;
 
+import com.motorplus.backend.dao.ServicioDAO;
 import com.motorplus.backend.entity.Servicio;
-import com.motorplus.backend.repository.ServicioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,45 +12,33 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ServicioController {
 
-    @Autowired
-    private ServicioRepository repository;
+    private ServicioDAO dao = new ServicioDAO();
 
     @GetMapping
     public List<Servicio> getAll() {
-        return repository.findAll();
+        return dao.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Servicio> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Servicio servicio = dao.findById(id);
+        return (servicio != null) ? ResponseEntity.ok(servicio) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
     public Servicio create(@RequestBody Servicio servicio) {
-        return repository.save(servicio);
+        return dao.save(servicio);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Servicio> update(@PathVariable Long id, @RequestBody Servicio details) {
-        return repository.findById(id)
-                .map(existing -> {
-                    existing.setNombre(details.getNombre());
-                    existing.setDescripcion(details.getDescripcion());
-                    existing.setPrecioBase(details.getPrecioBase());
-                    return ResponseEntity.ok(repository.save(existing));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Servicio updated = dao.update(id, details);
+        return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(existing -> {
-                    repository.delete(existing);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        boolean success = dao.deleteById(id);
+        return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }
