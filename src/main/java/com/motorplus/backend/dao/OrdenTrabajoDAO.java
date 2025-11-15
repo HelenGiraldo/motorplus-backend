@@ -61,6 +61,39 @@ public class OrdenTrabajoDAO {
         return null;
     }
 
+    public OrdenTrabajo update(Long id, OrdenTrabajo orden) {
+        // Generalmente solo se actualiza el diagnóstico o el estado
+        String sql = "UPDATE OrdenTrabajo SET diagnosticoInicial = ?, estado = ? WHERE idOrdenTrabajo = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, orden.getDiagnosticoInicial());
+            pstmt.setString(2, orden.getEstado());
+            pstmt.setLong(3, id);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                orden.setIdOrdenTrabajo(id);
+                return orden;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean deleteById(Long id) {
+        // ADVERTENCIA: Esto fallará si la orden tiene facturas, repuestos, etc., asociados (Foreign Keys).
+        // En un sistema real, se usaría un borrado en cascada o un "borrado lógico" (estado='Cancelada')
+        String sql = "DELETE FROM OrdenTrabajo WHERE idOrdenTrabajo = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            // Imprime el error de FK si ocurre
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private OrdenTrabajo mapRowToOrdenTrabajo(ResultSet rs) throws SQLException {
         return new OrdenTrabajo(
                 rs.getLong("idOrdenTrabajo"),
@@ -70,6 +103,4 @@ public class OrdenTrabajoDAO {
                 rs.getLong("idVehiculo")
         );
     }
-
-    // Faltarían update() y delete(), que son complejos (cancelaciones, etc.)
 }
