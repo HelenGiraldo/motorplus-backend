@@ -12,26 +12,38 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class VehiculoController {
 
-    private VehiculoDAO vehiculoDAO = new VehiculoDAO();
+    private VehiculoDAO dao = new VehiculoDAO();
 
     @GetMapping
     public List<Vehiculo> getAll() {
-        return vehiculoDAO.findAll();
+        return dao.findAll();
     }
 
     @GetMapping("/cliente/{clienteId}")
     public List<Vehiculo> getByClienteId(@PathVariable Long clienteId) {
-        return vehiculoDAO.findByClienteId(clienteId);
+        return dao.findByClienteId(clienteId);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Vehiculo> getById(@PathVariable Long id) {
-        Vehiculo vehiculo = vehiculoDAO.findById(id);
+        Vehiculo vehiculo = dao.findById(id);
         return (vehiculo != null) ? ResponseEntity.ok(vehiculo) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
     public Vehiculo create(@RequestBody Vehiculo vehiculo) {
-        return vehiculoDAO.save(vehiculo);
+        return dao.save(vehiculo);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Vehiculo> update(@PathVariable Long id, @RequestBody Vehiculo details) {
+        Vehiculo updated = dao.update(id, details);
+        return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        boolean success = dao.deleteById(id);
+        return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }

@@ -79,6 +79,39 @@ public class VehiculoDAO {
         return null;
     }
 
+    public Vehiculo update(Long id, Vehiculo vehiculo) {
+        String sql = "UPDATE Vehiculo SET placa = ?, marca = ?, modelo = ?, anio = ?, tipoServicioRequerido = ?, idCliente = ? WHERE idVehiculo = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, vehiculo.getPlaca());
+            pstmt.setString(2, vehiculo.getMarca());
+            pstmt.setString(3, vehiculo.getModelo());
+            pstmt.setInt(4, vehiculo.getAnio());
+            pstmt.setString(5, vehiculo.getTipoServicioRequerido());
+            pstmt.setLong(6, vehiculo.getIdCliente());
+            pstmt.setLong(7, id);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                vehiculo.setIdVehiculo(id);
+                return vehiculo;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean deleteById(Long id) {
+        String sql = "DELETE FROM Vehiculo WHERE idVehiculo = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private Vehiculo mapRowToVehiculo(ResultSet rs) throws SQLException {
         return new Vehiculo(
                 rs.getLong("idVehiculo"),
@@ -90,6 +123,4 @@ public class VehiculoDAO {
                 rs.getLong("idCliente")
         );
     }
-
-    // Faltarían update() y delete()
 }
