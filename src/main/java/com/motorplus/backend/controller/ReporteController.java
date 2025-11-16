@@ -15,54 +15,38 @@ public class ReporteController {
 
     private ReporteDAO reporteDAO = new ReporteDAO();
 
-    @GetMapping("/simple/clientes")
-    public ResponseEntity<List<Map<String, Object>>> getReporteClientes() {
-        return ResponseEntity.ok(reporteDAO.getReporteClientes());
+    // Accede a los reportes de complejidad simple/intermedia
+    @GetMapping("/listado/{nombreReporte}")
+    public ResponseEntity<List<Map<String, Object>>> getListadoReporte(@PathVariable String nombreReporte) {
+        switch (nombreReporte) {
+            case "clientes":
+                return ResponseEntity.ok(reporteDAO.getReporteClientes());
+            case "mecanicos":
+                return ResponseEntity.ok(reporteDAO.getReporteMecanicos());
+            case "inventario":
+                return ResponseEntity.ok(reporteDAO.getReporteInventario());
+            case "pendientes":
+                return ResponseEntity.ok(reporteDAO.getReporteFacturasPendientes());
+            case "usados":
+                return ResponseEntity.ok(reporteDAO.getReporteRepuestosUsados());
+            // Nota: Historial de vehículo y Órdenes por mes requieren parámetros adicionales.
+            default:
+                return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/simple/mecanicos")
-    public ResponseEntity<List<Map<String, Object>>> getReporteMecanicos() {
-        return ResponseEntity.ok(reporteDAO.getReporteMecanicos());
-    }
-
-    @GetMapping("/simple/inventario")
-    public ResponseEntity<List<Map<String, Object>>> getReporteInventario() {
-        return ResponseEntity.ok(reporteDAO.getReporteInventario());
-    }
-
-    @GetMapping("/intermedio/ordenes-mes")
-    public ResponseEntity<List<Map<String, Object>>> getReporteOrdenesMes() {
-        LocalDate now = LocalDate.now();
-        return ResponseEntity.ok(reporteDAO.getReporteOrdenesMes(now.getYear(), now.getMonthValue()));
-    }
-
-    @GetMapping("/intermedio/facturas-pendientes")
-    public ResponseEntity<List<Map<String, Object>>> getReporteFacturasPendientes() {
-        return ResponseEntity.ok(reporteDAO.getReporteFacturasPendientes());
-    }
-
-    @GetMapping("/intermedio/repuestos-usados")
-    public ResponseEntity<List<Map<String, Object>>> getReporteRepuestosUsados() {
-        return ResponseEntity.ok(reporteDAO.getReporteRepuestosUsados());
-    }
-
-    @GetMapping("/intermedio/historial-vehiculo/{placa}")
-    public ResponseEntity<List<Map<String, Object>>> getReporteHistorialVehiculo(@PathVariable String placa) {
-        return ResponseEntity.ok(reporteDAO.getReporteHistorialVehiculo(placa));
-    }
-
-    @GetMapping("/complejo/ventas-mes")
-    public ResponseEntity<List<Map<String, Object>>> getReporteVentasMes() {
-        return ResponseEntity.ok(reporteDAO.getReporteVentasMes());
-    }
-
-    @GetMapping("/complejo/mecanicos-productivos")
-    public ResponseEntity<List<Map<String, Object>>> getReporteMecanicosProductivos() {
-        return ResponseEntity.ok(reporteDAO.getReporteMecanicosProductivos());
-    }
-
-    @GetMapping("/complejo/servicios-populares")
-    public ResponseEntity<List<Map<String, Object>>> getReporteServiciosPopulares() {
-        return ResponseEntity.ok(reporteDAO.getReporteServiciosPopulares());
+    // Accede a los reportes complejos (gráficos)
+    @GetMapping("/graficos/{nombreGrafico}")
+    public ResponseEntity<List<Map<String, Object>>> getDatosGrafico(@PathVariable String nombreGrafico) {
+        switch (nombreGrafico) {
+            case "ventas-mes":
+                return ResponseEntity.ok(reporteDAO.getReporteVentasMes());
+            case "productivos":
+                return ResponseEntity.ok(reporteDAO.getReporteMecanicosProductivos());
+            case "populares":
+                return ResponseEntity.ok(reporteDAO.getReporteServiciosPopulares());
+            default:
+                return ResponseEntity.notFound().build();
+        }
     }
 }

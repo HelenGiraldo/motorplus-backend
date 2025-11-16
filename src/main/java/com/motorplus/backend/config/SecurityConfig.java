@@ -27,7 +27,6 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // Inyectamos nuestro DAO manualmente
         final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
         return username -> {
@@ -46,7 +45,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+
                 .csrf(AbstractHttpConfigurer::disable)
+
+                // Configurar CORS para permitir Angular
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of("http://localhost:4200", "*"));
@@ -54,11 +56,14 @@ public class SecurityConfig {
                     config.setAllowedHeaders(List.of("*"));
                     return config;
                 }))
+
                 .authorizeHttpRequests(auth -> auth
+                        // Permitir el login
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        // Permitir TODO lo demás (desactiva el pop-up)
+                        .anyRequest().permitAll()
                 )
-                .httpBasic(basic -> {});
+        ;
 
         return http.build();
     }

@@ -103,4 +103,16 @@ public class OrdenTrabajoDAO {
                 rs.getLong("idVehiculo")
         );
     }
+
+    public boolean updateStatus(Long id, String newStatus) {
+        String sql = "UPDATE OrdenTrabajo SET estado = ? WHERE idOrdenTrabajo = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newStatus);
+            pstmt.setLong(2, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

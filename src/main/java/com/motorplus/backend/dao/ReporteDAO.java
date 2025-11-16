@@ -16,6 +16,7 @@ public class ReporteDAO {
 
     private Connection conn = DatabaseConnection.getConnection();
 
+    // Helper para ejecutar cualquier consulta SQL y devolverla como una lista de mapas
     private List<Map<String, Object>> executeQuery(String sql, Object... params) {
         List<Map<String, Object>> results = new ArrayList<>();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -41,19 +42,21 @@ public class ReporteDAO {
         return results;
     }
 
-    // Reporte 1
+    // --- REPORTES SIMPLES (3) ---
+
+    // Reporte 1: Listado de Clientes (Simple)
     public List<Map<String, Object>> getReporteClientes() {
         String sql = "SELECT documento, nombres, apellidos, telefono, email FROM Cliente ORDER BY apellidos";
         return executeQuery(sql);
     }
 
-    // Reporte 2
+    // Reporte 2: Listado de Mecánicos (Simple)
     public List<Map<String, Object>> getReporteMecanicos() {
         String sql = "SELECT documento, nombres, apellidos, especialidad FROM Mecanico ORDER BY especialidad, apellidos";
         return executeQuery(sql);
     }
 
-    // Reporte 3
+    // Reporte 3: Inventario de Repuestos (Intermedio/Simple)
     public List<Map<String, Object>> getReporteInventario() {
         String sql = "SELECT r.nombre, r.stockDisponible, r.costoUnitario, p.nombre AS proveedor " +
                 "FROM Repuesto r " +
@@ -62,7 +65,9 @@ public class ReporteDAO {
         return executeQuery(sql);
     }
 
-    // Reporte 4
+    // --- REPORTES INTERMEDIOS (4) ---
+
+    // Reporte 4: Órdenes de un mes (Intermedio)
     public List<Map<String, Object>> getReporteOrdenesMes(int anio, int mes) {
         String sql = "SELECT ot.idOrdenTrabajo, ot.fechaIngreso, ot.estado, v.placa, c.nombres, c.apellidos " +
                 "FROM OrdenTrabajo ot " +
@@ -73,7 +78,7 @@ public class ReporteDAO {
         return executeQuery(sql, anio, mes);
     }
 
-    // Reporte 5
+    // Reporte 5: Facturas pendientes (Intermedio)
     public List<Map<String, Object>> getReporteFacturasPendientes() {
         String sql = "SELECT f.idFactura, f.fechaEmision, f.valorTotal, c.nombres, c.apellidos " +
                 "FROM Factura f " +
@@ -85,7 +90,7 @@ public class ReporteDAO {
         return executeQuery(sql);
     }
 
-    // Reporte 6
+    // Reporte 6: Repuestos más usados (Intermedio, con SUM y GROUP BY)
     public List<Map<String, Object>> getReporteRepuestosUsados() {
         String sql = "SELECT r.nombre, SUM(or_rep.cantidad) AS totalUsado " +
                 "FROM OrdenRepuesto or_rep " +
@@ -96,7 +101,7 @@ public class ReporteDAO {
         return executeQuery(sql);
     }
 
-    // Reporte 7
+    // Reporte 7: Historial de un vehículo (Intermedio/Complejo)
     public List<Map<String, Object>> getReporteHistorialVehiculo(String placa) {
         String sql = "SELECT ot.fechaIngreso, ot.diagnosticoInicial, f.valorTotal, ot.estado " +
                 "FROM OrdenTrabajo ot " +
@@ -107,7 +112,9 @@ public class ReporteDAO {
         return executeQuery(sql, placa);
     }
 
-    // Reporte 8
+    // --- REPORTES COMPLEJOS (3 - Para Gráficos) ---
+
+    // Reporte 8: Ventas por mes (Complejo, para gráfico)
     public List<Map<String, Object>> getReporteVentasMes() {
         String sql = "SELECT DATE_FORMAT(fechaEmision, '%Y-%m') AS mes, SUM(valorTotal) AS totalVentas " +
                 "FROM Factura " +
@@ -117,7 +124,7 @@ public class ReporteDAO {
         return executeQuery(sql);
     }
 
-    // Reporte 9
+    // Reporte 9: Mecánicos más productivos (Complejo, para gráfico)
     public List<Map<String, Object>> getReporteMecanicosProductivos() {
         String sql = "SELECT m.nombres, m.apellidos, COUNT(om.idOrdenTrabajo) AS totalOrdenes " +
                 "FROM OrdenMecanico om " +
@@ -128,7 +135,7 @@ public class ReporteDAO {
         return executeQuery(sql);
     }
 
-    // Reporte 10
+    // Reporte 10: Servicios más populares (Complejo, para gráfico)
     public List<Map<String, Object>> getReporteServiciosPopulares() {
         String sql = "SELECT s.nombre, COUNT(os.idServicio) AS cantidad " +
                 "FROM OrdenServicio os " +
