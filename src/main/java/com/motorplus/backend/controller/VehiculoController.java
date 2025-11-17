@@ -46,4 +46,9 @@ public class VehiculoController {
         boolean success = dao.deleteById(id);
         return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/all-history")
+    public List<Vehiculo> getAllHistory() {
+        return dao.findAllIncludingInactive();
+    }
 }

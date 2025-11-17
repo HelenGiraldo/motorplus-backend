@@ -10,6 +10,6 @@ public class Vehiculo {
     private String marca;
     private String modelo;
     private Integer anio;
-    private String tipoServicioRequerido;
-    private Long idCliente; // Guardamos solo el ID
+    private Long idCliente;
+    private String color;
 }

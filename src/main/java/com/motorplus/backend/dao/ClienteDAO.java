@@ -9,12 +9,12 @@ import java.util.List;
 
 public class ClienteDAO {
 
-    private Connection conn = DatabaseConnection.getConnection();
-
     public List<Cliente> findAll() {
         List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM Cliente";
-        try (Statement stmt = conn.createStatement();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -28,7 +28,10 @@ public class ClienteDAO {
 
     public Cliente findById(Long id) {
         String sql = "SELECT * FROM Cliente WHERE idCliente = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -43,7 +46,10 @@ public class ClienteDAO {
 
     public Cliente save(Cliente cliente) {
         String sql = "INSERT INTO Cliente (nombres, apellidos, documento, telefono, email, direccion) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, cliente.getNombres());
             pstmt.setString(2, cliente.getApellidos());
             pstmt.setString(3, cliente.getDocumento());
@@ -72,7 +78,10 @@ public class ClienteDAO {
 
     public Cliente update(Long id, Cliente cliente) {
         String sql = "UPDATE Cliente SET nombres = ?, apellidos = ?, documento = ?, telefono = ?, email = ?, direccion = ? WHERE idCliente = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, cliente.getNombres());
             pstmt.setString(2, cliente.getApellidos());
             pstmt.setString(3, cliente.getDocumento());
@@ -94,7 +103,10 @@ public class ClienteDAO {
 
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM Cliente WHERE idCliente = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
@@ -113,7 +125,7 @@ public class ClienteDAO {
                 rs.getString("telefono"),
                 rs.getString("email"),
                 rs.getString("direccion"),
-                null // Vehiculos se cargan por separado si es necesario
+                null
         );
     }
 }

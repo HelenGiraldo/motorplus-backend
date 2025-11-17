@@ -9,13 +9,14 @@ import java.util.List;
 
 public class MecanicoDAO {
 
-    private Connection conn = DatabaseConnection.getConnection();
-
     public List<Mecanico> findAll() {
         List<Mecanico> mecanicos = new ArrayList<>();
         String sql = "SELECT * FROM Mecanico";
-        try (Statement stmt = conn.createStatement();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
                 mecanicos.add(mapRowToMecanico(rs));
             }
@@ -27,7 +28,10 @@ public class MecanicoDAO {
 
     public Mecanico findById(Long id) {
         String sql = "SELECT * FROM Mecanico WHERE idMecanico = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -42,7 +46,10 @@ public class MecanicoDAO {
 
     public Mecanico save(Mecanico mecanico) {
         String sql = "INSERT INTO Mecanico (nombres, apellidos, documento, especialidad) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, mecanico.getNombres());
             pstmt.setString(2, mecanico.getApellidos());
             pstmt.setString(3, mecanico.getDocumento());
@@ -63,7 +70,10 @@ public class MecanicoDAO {
 
     public Mecanico update(Long id, Mecanico mecanico) {
         String sql = "UPDATE Mecanico SET nombres = ?, apellidos = ?, documento = ?, especialidad = ? WHERE idMecanico = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, mecanico.getNombres());
             pstmt.setString(2, mecanico.getApellidos());
             pstmt.setString(3, mecanico.getDocumento());
@@ -83,7 +93,10 @@ public class MecanicoDAO {
 
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM Mecanico WHERE idMecanico = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {

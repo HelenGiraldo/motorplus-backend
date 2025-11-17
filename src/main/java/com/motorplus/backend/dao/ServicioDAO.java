@@ -2,20 +2,23 @@ package com.motorplus.backend.dao;
 
 import com.motorplus.backend.database.DatabaseConnection;
 import com.motorplus.backend.entity.Servicio;
+import com.motorplus.backend.entity.TipoServicio;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class ServicioDAO {
-
-    private Connection conn = DatabaseConnection.getConnection();
 
     public List<Servicio> findAll() {
         List<Servicio> servicios = new ArrayList<>();
         String sql = "SELECT * FROM Servicio";
-        try (Statement stmt = conn.createStatement();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
                 servicios.add(mapRowToServicio(rs));
             }
@@ -27,7 +30,10 @@ public class ServicioDAO {
 
     public Servicio findById(Long id) {
         String sql = "SELECT * FROM Servicio WHERE idServicio = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -40,12 +46,42 @@ public class ServicioDAO {
         return null;
     }
 
+    public List<Servicio> findByTipoServicio(TipoServicio tipoServicio) {
+        List<Servicio> servicios = new ArrayList<>();
+        String sql = "SELECT * FROM Servicio WHERE idTipoServicio = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, tipoServicio.getId());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    servicios.add(mapRowToServicio(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return servicios;
+    }
+
     public Servicio save(Servicio servicio) {
-        String sql = "INSERT INTO Servicio (nombre, descripcion, precioBase) VALUES (?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO Servicio (nombre, descripcion, precioBase, duracionEstimada, tipoServicio, idTipoServicio) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, servicio.getNombre());
             pstmt.setString(2, servicio.getDescripcion());
-            pstmt.setBigDecimal(3, servicio.getPrecioBase());
+            pstmt.setBigDecimal(3, BigDecimal.valueOf(servicio.getPrecioBase()));
+            pstmt.setInt(4, servicio.getDuracionEstimada());
+            pstmt.setString(5, servicio.getTipoServicio());
+
+            if (servicio.getIdTipoServicio() != null) {
+                pstmt.setLong(6, servicio.getIdTipoServicio());
+            } else {
+                pstmt.setNull(6, Types.BIGINT);
+            }
 
             pstmt.executeUpdate();
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -61,12 +97,24 @@ public class ServicioDAO {
     }
 
     public Servicio update(Long id, Servicio servicio) {
-        String sql = "UPDATE Servicio SET nombre = ?, descripcion = ?, precioBase = ? WHERE idServicio = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        String sql = "UPDATE Servicio SET nombre = ?, descripcion = ?, precioBase = ?, duracionEstimada = ?, tipoServicio = ?, idTipoServicio = ? WHERE idServicio = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, servicio.getNombre());
             pstmt.setString(2, servicio.getDescripcion());
-            pstmt.setBigDecimal(3, servicio.getPrecioBase());
-            pstmt.setLong(4, id);
+            pstmt.setBigDecimal(3, BigDecimal.valueOf(servicio.getPrecioBase()));
+            pstmt.setInt(4, servicio.getDuracionEstimada());
+            pstmt.setString(5, servicio.getTipoServicio());
+
+            if (servicio.getIdTipoServicio() != null) {
+                pstmt.setLong(6, servicio.getIdTipoServicio());
+            } else {
+                pstmt.setNull(6, Types.BIGINT);
+            }
+
+            pstmt.setLong(7, id);
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -81,7 +129,10 @@ public class ServicioDAO {
 
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM Servicio WHERE idServicio = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -91,11 +142,23 @@ public class ServicioDAO {
     }
 
     private Servicio mapRowToServicio(ResultSet rs) throws SQLException {
-        return new Servicio(
-                rs.getLong("idServicio"),
-                rs.getString("nombre"),
-                rs.getString("descripcion"),
-                rs.getBigDecimal("precioBase")
-        );
+        Servicio servicio = new Servicio();
+        servicio.setIdServicio(rs.getLong("idServicio"));
+        servicio.setNombre(rs.getString("nombre"));
+        servicio.setDescripcion(rs.getString("descripcion"));
+        servicio.setPrecioBase(rs.getDouble("precioBase"));
+        servicio.setDuracionEstimada(rs.getInt("duracionEstimada"));
+
+        // SOLUCIÓN: Lee el campo tipoServicio como String (ENUM)
+        String tipoServicio = rs.getString("tipoServicio");
+        servicio.setTipoServicio(tipoServicio);
+
+        // Lee idTipoServicio si existe
+        long idTipoServicio = rs.getLong("idTipoServicio");
+        if (!rs.wasNull()) {
+            servicio.setIdTipoServicio(idTipoServicio);
+        }
+
+        return servicio;
     }
 }

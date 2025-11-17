@@ -9,13 +9,14 @@ import java.util.List;
 
 public class ProveedorDAO {
 
-    private Connection conn = DatabaseConnection.getConnection();
-
     public List<Proveedor> findAll() {
         List<Proveedor> proveedores = new ArrayList<>();
         String sql = "SELECT * FROM Proveedor";
-        try (Statement stmt = conn.createStatement();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
                 proveedores.add(mapRowToProveedor(rs));
             }
@@ -27,7 +28,10 @@ public class ProveedorDAO {
 
     public Proveedor findById(Long id) {
         String sql = "SELECT * FROM Proveedor WHERE idProveedor = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -42,7 +46,10 @@ public class ProveedorDAO {
 
     public Proveedor save(Proveedor proveedor) {
         String sql = "INSERT INTO Proveedor (nombre, nit, telefono, direccion) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, proveedor.getNombre());
             pstmt.setString(2, proveedor.getNit());
             pstmt.setString(3, proveedor.getTelefono());
@@ -63,7 +70,10 @@ public class ProveedorDAO {
 
     public Proveedor update(Long id, Proveedor proveedor) {
         String sql = "UPDATE Proveedor SET nombre = ?, nit = ?, telefono = ?, direccion = ? WHERE idProveedor = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, proveedor.getNombre());
             pstmt.setString(2, proveedor.getNit());
             pstmt.setString(3, proveedor.getTelefono());
@@ -83,7 +93,10 @@ public class ProveedorDAO {
 
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM Proveedor WHERE idProveedor = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {

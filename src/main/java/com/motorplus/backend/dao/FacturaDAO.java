@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 
 public class FacturaDAO {
 
-    private Connection conn = DatabaseConnection.getConnection();
-
     public List<Factura> findAll() {
         List<Factura> facturas = new ArrayList<>();
         String sql = "SELECT * FROM Factura";
-        try (Statement stmt = conn.createStatement();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -28,7 +28,10 @@ public class FacturaDAO {
 
     public Factura findById(Long id) {
         String sql = "SELECT * FROM Factura WHERE idFactura = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -41,22 +44,12 @@ public class FacturaDAO {
         return null;
     }
 
-    private Factura mapRowToFactura(ResultSet rs) throws SQLException {
-        return new Factura(
-                rs.getLong("idFactura"),
-                rs.getTimestamp("fechaEmision").toLocalDateTime(),
-                rs.getString("estadoPago"),
-                rs.getBigDecimal("costoManoObra"),
-                rs.getBigDecimal("costoRepuestos"),
-                rs.getBigDecimal("impuestos"),
-                rs.getBigDecimal("valorTotal"),
-                rs.getLong("idOrdenTrabajo")
-        );
-    }
-
     public boolean updateStatus(Long id, String newStatus) {
         String sql = "UPDATE Factura SET estadoPago = ? WHERE idFactura = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, newStatus);
             pstmt.setLong(2, id);
             return pstmt.executeUpdate() > 0;
@@ -68,9 +61,12 @@ public class FacturaDAO {
 
     public Factura save(Factura factura) {
         String sql = "INSERT INTO Factura (fechaEmision, estadoPago, costoManoObra, costoRepuestos, impuestos, valorTotal, idOrdenTrabajo) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-            pstmt.setString(2, "Pagada"); // Asumimos que se paga al facturar
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setTimestamp(1, Timestamp.valueOf(factura.getFechaEmision() != null ? factura.getFechaEmision() : LocalDateTime.now()));
+            pstmt.setString(2, factura.getEstadoPago() != null ? factura.getEstadoPago() : "Pagada");
             pstmt.setBigDecimal(3, factura.getCostoManoObra());
             pstmt.setBigDecimal(4, factura.getCostoRepuestos());
             pstmt.setBigDecimal(5, factura.getImpuestos());
@@ -88,5 +84,23 @@ public class FacturaDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Factura mapRowToFactura(ResultSet rs) throws SQLException {
+        Factura factura = new Factura();
+        factura.setIdFactura(rs.getLong("idFactura"));
+
+        Timestamp fechaEmision = rs.getTimestamp("fechaEmision");
+        if (fechaEmision != null) {
+            factura.setFechaEmision(fechaEmision.toLocalDateTime());
+        }
+
+        factura.setEstadoPago(rs.getString("estadoPago"));
+        factura.setCostoManoObra(rs.getBigDecimal("costoManoObra"));
+        factura.setCostoRepuestos(rs.getBigDecimal("costoRepuestos"));
+        factura.setImpuestos(rs.getBigDecimal("impuestos"));
+        factura.setValorTotal(rs.getBigDecimal("valorTotal"));
+        factura.setIdOrdenTrabajo(rs.getLong("idOrdenTrabajo"));
+        return factura;
     }
 }

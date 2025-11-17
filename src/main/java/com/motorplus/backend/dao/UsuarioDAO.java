@@ -10,11 +10,12 @@ import java.sql.SQLException;
 
 public class UsuarioDAO {
 
-    private Connection conn = DatabaseConnection.getConnection();
-
     public Usuario findByUsername(String username) {
         String sql = "SELECT * FROM Usuario WHERE username = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {

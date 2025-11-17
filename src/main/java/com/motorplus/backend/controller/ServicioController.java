@@ -12,33 +12,33 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ServicioController {
 
-    private ServicioDAO dao = new ServicioDAO();
+    private ServicioDAO servicioDAO = new ServicioDAO();
 
     @GetMapping
     public List<Servicio> getAll() {
-        return dao.findAll();
+        return servicioDAO.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Servicio> getById(@PathVariable Long id) {
-        Servicio servicio = dao.findById(id);
+        Servicio servicio = servicioDAO.findById(id);
         return (servicio != null) ? ResponseEntity.ok(servicio) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
     public Servicio create(@RequestBody Servicio servicio) {
-        return dao.save(servicio);
+        return servicioDAO.save(servicio);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Servicio> update(@PathVariable Long id, @RequestBody Servicio details) {
-        Servicio updated = dao.update(id, details);
+    public ResponseEntity<Servicio> update(@PathVariable Long id, @RequestBody Servicio servicio) {
+        Servicio updated = servicioDAO.update(id, servicio);
         return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean success = dao.deleteById(id);
+        boolean success = servicioDAO.deleteById(id);
         return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }
