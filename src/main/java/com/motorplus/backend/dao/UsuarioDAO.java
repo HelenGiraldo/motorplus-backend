@@ -22,8 +22,7 @@ public class UsuarioDAO {
                     return new Usuario(
                             rs.getLong("idUsuario"),
                             rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getLong("idMecanico")
+                            rs.getString("password")
                     );
                 }
             }

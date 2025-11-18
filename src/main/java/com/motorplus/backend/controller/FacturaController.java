@@ -51,7 +51,7 @@ public class FacturaController {
     }
 
     // ==========================================
-    // DESCARGAR FACTURA EN PDF
+    // DESCARGAR FACTURA EN P1DF
     // ==========================================
     @GetMapping(value = "/{id}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> descargarFacturaPDF(@PathVariable Long id) {

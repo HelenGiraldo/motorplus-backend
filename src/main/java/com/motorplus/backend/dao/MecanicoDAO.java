@@ -14,7 +14,7 @@ public class MecanicoDAO {
 
     public List<Mecanico> findAll() {
         List<Mecanico> mecanicos = new ArrayList<>();
-        // QUITAR JOIN con especialidad ya que ahora es relación N:M
+
         String sql = "SELECT * FROM Mecanico";
 
         try (Connection conn = DatabaseConnection.getConnection();

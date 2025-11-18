@@ -177,7 +177,7 @@ public class OrdenTrabajoController {
                         .body(Map.of("success", false, "message", "La cantidad de repuestos debe ser mayor a cero."));
             }
 
-            // ✅ CAMBIO: Usar ProveedorRepuestoDAO en lugar de RepuestoDAO
+            // CAMBIO: Usar ProveedorRepuestoDAO en lugar de RepuestoDAO
             ProveedorRepuestoDAO proveedorRepuestoDAO = new ProveedorRepuestoDAO();
 
             // Verificar stock en ProveedorRepuesto

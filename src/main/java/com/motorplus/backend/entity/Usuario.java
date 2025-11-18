@@ -9,5 +9,4 @@ public class Usuario {
     private Long idUsuario;
     private String username;
     private String password;
-    private Long idMecanico;
 }
