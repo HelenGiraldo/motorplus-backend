@@ -13,7 +13,7 @@ public class Servicio {
     private String nombre;
     private String descripcion;
     private Long idTipoServicio;
-    private BigDecimal precioBase;
+    private Double precioBase;
     private Integer duracionEstimada;
     private TipoServicio TipoServicio;
 }

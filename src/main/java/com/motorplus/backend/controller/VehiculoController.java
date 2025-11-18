@@ -6,10 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/vehiculos")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
 public class VehiculoController {
 
     private VehiculoDAO dao = new VehiculoDAO();
@@ -50,5 +51,17 @@ public class VehiculoController {
     @GetMapping("/all-history")
     public List<Vehiculo> getAllHistory() {
         return dao.findAllIncludingInactive();
+    }
+
+    // NUEVO ENDPOINT PARA CAMBIAR ESTADO
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<Void> cambiarEstado(@PathVariable Long id, @RequestBody Map<String, Boolean> request) {
+        Boolean activo = request.get("activo");
+        if (activo == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        boolean success = dao.cambiarEstado(id, activo);
+        return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }

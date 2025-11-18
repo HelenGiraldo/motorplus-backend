@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Repuesto {
     private Long idRepuesto;
-    private Long idProveedor;
     private String nombre;
     private String descripcion;
     private BigDecimal costoUnitario;

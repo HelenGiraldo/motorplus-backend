@@ -2,6 +2,7 @@ package com.motorplus.backend.dao;
 
 import com.motorplus.backend.database.DatabaseConnection;
 import com.motorplus.backend.entity.Factura;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,5 +103,42 @@ public class FacturaDAO {
         factura.setValorTotal(rs.getBigDecimal("valorTotal"));
         factura.setIdOrdenTrabajo(rs.getLong("idOrdenTrabajo"));
         return factura;
+    }
+
+    public Factura findByOrdenId(Long ordenId) {
+        String sql = "SELECT * FROM Factura WHERE idOrdenTrabajo = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, ordenId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToFactura(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Factura> findByEstado(String estado) {
+        List<Factura> facturas = new ArrayList<>();
+        String sql = "SELECT * FROM Factura WHERE estadoPago = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, estado);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    facturas.add(mapRowToFactura(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return facturas;
     }
 }

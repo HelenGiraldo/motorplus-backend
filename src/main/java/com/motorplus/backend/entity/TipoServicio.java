@@ -3,11 +3,13 @@ package com.motorplus.backend.entity;
 import java.util.List;
 
 public enum TipoServicio {
-    MECANICA(1L, "Mecánica"),
-    ELECTRICIDAD(2L, "Electricidad"),
-    PINTURA(3L, "Pintura"),
-    MANTENIMIENTO(4L, "Mantenimiento"),
-    DIAGNOSTICO(5L, "Diagnóstico");
+    PREVENTIVO(1L, "Preventivo"),        // ← Cambiado a PREVENTIVO
+    CORRECTIVO(2L, "Correctivo"),        // ← Agregado
+    ESPECIALIZADO(3L, "Especializado"),  // ← Agregado
+    MECANICA(4L, "Mecánica"),
+    ELECTRICIDAD(5L, "Electricidad"),
+    PINTURA(6L, "Pintura"),
+    DIAGNOSTICO(7L, "Diagnóstico");
 
     private final Long id;
     private final String nombre;

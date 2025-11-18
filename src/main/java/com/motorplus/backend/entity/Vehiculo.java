@@ -12,4 +12,5 @@ public class Vehiculo {
     private Integer anio;
     private Long idCliente;
     private String color;
+    private Boolean activo = true;
 }

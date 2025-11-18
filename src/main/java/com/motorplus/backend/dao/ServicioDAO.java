@@ -7,7 +7,6 @@ import com.motorplus.backend.entity.TipoServicio;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigDecimal;
 
 public class ServicioDAO {
 
@@ -73,9 +72,11 @@ public class ServicioDAO {
 
             pstmt.setString(1, servicio.getNombre());
             pstmt.setString(2, servicio.getDescripcion());
-            pstmt.setBigDecimal(3, BigDecimal.valueOf(servicio.getPrecioBase()));
+            pstmt.setDouble(3, servicio.getPrecioBase());
             pstmt.setInt(4, servicio.getDuracionEstimada());
-            pstmt.setString(5, servicio.getTipoServicio());
+
+            // CORRECCIÓN: Convertir el ENUM a String
+            pstmt.setString(5, servicio.getTipoServicio().name()); // ← .name() para el ENUM
 
             if (servicio.getIdTipoServicio() != null) {
                 pstmt.setLong(6, servicio.getIdTipoServicio());
@@ -104,9 +105,11 @@ public class ServicioDAO {
 
             pstmt.setString(1, servicio.getNombre());
             pstmt.setString(2, servicio.getDescripcion());
-            pstmt.setBigDecimal(3, BigDecimal.valueOf(servicio.getPrecioBase()));
+            pstmt.setDouble(3, servicio.getPrecioBase());
             pstmt.setInt(4, servicio.getDuracionEstimada());
-            pstmt.setString(5, servicio.getTipoServicio());
+
+            // CORRECCIÓN: Agregar .name() aquí también
+            pstmt.setString(5, servicio.getTipoServicio().name()); // ← FALTABA .name()
 
             if (servicio.getIdTipoServicio() != null) {
                 pstmt.setLong(6, servicio.getIdTipoServicio());
@@ -149,11 +152,12 @@ public class ServicioDAO {
         servicio.setPrecioBase(rs.getDouble("precioBase"));
         servicio.setDuracionEstimada(rs.getInt("duracionEstimada"));
 
-        // SOLUCIÓN: Lee el campo tipoServicio como String (ENUM)
-        String tipoServicio = rs.getString("tipoServicio");
-        servicio.setTipoServicio(tipoServicio);
+        // CORRECCIÓN: Usar fromNombre en lugar de valueOf
+        String tipoServicioStr = rs.getString("tipoServicio");
+        if (tipoServicioStr != null) {
+            servicio.setTipoServicio(TipoServicio.fromNombre(tipoServicioStr));
+        }
 
-        // Lee idTipoServicio si existe
         long idTipoServicio = rs.getLong("idTipoServicio");
         if (!rs.wasNull()) {
             servicio.setIdTipoServicio(idTipoServicio);

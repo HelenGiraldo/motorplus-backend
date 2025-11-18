@@ -31,13 +31,13 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> update(@PathVariable Long id, @RequestBody Cliente details) {
+    public ResponseEntity<Cliente> update(@PathVariable Integer id, @RequestBody Cliente details) {
         Cliente updated = dao.update(id, details);
         return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         boolean success = dao.deleteById(id);
         return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }

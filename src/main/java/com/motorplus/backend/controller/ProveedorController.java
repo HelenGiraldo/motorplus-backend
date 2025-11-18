@@ -20,7 +20,7 @@ public class ProveedorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Proveedor> getById(@PathVariable Long id) {
+    public ResponseEntity<Proveedor> getById(@PathVariable Integer id) { // Cambiado: Long → Integer
         Proveedor proveedor = dao.findById(id);
         return (proveedor != null) ? ResponseEntity.ok(proveedor) : ResponseEntity.notFound().build();
     }
@@ -31,13 +31,13 @@ public class ProveedorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Proveedor> update(@PathVariable Long id, @RequestBody Proveedor details) {
+    public ResponseEntity<Proveedor> update(@PathVariable Integer id, @RequestBody Proveedor details) { // Cambiado: Long → Integer
         Proveedor updated = dao.update(id, details);
         return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) { // Cambiado: Long → Integer
         boolean success = dao.deleteById(id);
         return (success) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }

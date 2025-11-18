@@ -95,4 +95,28 @@ public class OrdenTrabajoDAO {
         }
         return null;
     }
+
+    public boolean facturarOrden(Long ordenId, Double subtotal, Double iva, Double total, String estado) {
+        // CORREGIDO: Usar el nombre correcto de la tabla y columnas
+        String sql = "UPDATE OrdenTrabajo SET subtotal = ?, iva = ?, total = ?, estado = ? WHERE idOrdenTrabajo = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setDouble(1, subtotal);
+            pstmt.setDouble(2, iva);
+            pstmt.setDouble(3, total);
+            pstmt.setString(4, estado);
+            pstmt.setLong(5, ordenId);
+
+            int affectedRows = pstmt.executeUpdate();
+            System.out.println("Filas afectadas al facturar: " + affectedRows);
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error en facturarOrden: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

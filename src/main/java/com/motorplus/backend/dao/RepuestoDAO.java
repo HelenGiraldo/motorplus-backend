@@ -11,7 +11,8 @@ public class RepuestoDAO {
 
     public List<Repuesto> findAll() {
         List<Repuesto> repuestos = new ArrayList<>();
-        String sql = "SELECT * FROM Repuesto";
+        // ELIMINAR idProveedor del SELECT
+        String sql = "SELECT idRepuesto, nombre, descripcion, costoUnitario, precioVenta, stockDisponible, stockMinimo FROM Repuesto";
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -27,7 +28,8 @@ public class RepuestoDAO {
     }
 
     public Repuesto findById(Long id) {
-        String sql = "SELECT * FROM Repuesto WHERE idRepuesto = ?";
+        // ELIMINAR idProveedor del SELECT
+        String sql = "SELECT idRepuesto, nombre, descripcion, costoUnitario, precioVenta, stockDisponible, stockMinimo FROM Repuesto WHERE idRepuesto = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -45,18 +47,18 @@ public class RepuestoDAO {
     }
 
     public Repuesto save(Repuesto repuesto) {
-        String sql = "INSERT INTO Repuesto (idProveedor, nombre, descripcion, costoUnitario, precioVenta, stockDisponible, stockMinimo) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+        // ELIMINAR idProveedor del INSERT
+        String sql = "INSERT INTO Repuesto(nombre, descripcion, costoUnitario, precioVenta, stockDisponible, stockMinimo) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            pstmt.setLong(1, repuesto.getIdProveedor());
-            pstmt.setString(2, repuesto.getNombre());
-            pstmt.setString(3, repuesto.getDescripcion());
-            pstmt.setBigDecimal(4, repuesto.getCostoUnitario());
-            pstmt.setBigDecimal(5, repuesto.getPrecioVenta());
-            pstmt.setInt(6, repuesto.getStockDisponible());
-            pstmt.setInt(7, repuesto.getStockMinimo());
+            // ELIMINAR la línea de idProveedor
+            pstmt.setString(1, repuesto.getNombre());
+            pstmt.setString(2, repuesto.getDescripcion());
+            pstmt.setBigDecimal(3, repuesto.getCostoUnitario());
+            pstmt.setBigDecimal(4, repuesto.getPrecioVenta());
+            pstmt.setInt(5, repuesto.getStockDisponible());
+            pstmt.setInt(6, repuesto.getStockMinimo());
 
             pstmt.executeUpdate();
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -72,19 +74,20 @@ public class RepuestoDAO {
     }
 
     public Repuesto update(Long id, Repuesto repuesto) {
-        String sql = "UPDATE Repuesto SET idProveedor = ?, nombre = ?, descripcion = ?, costoUnitario = ?, precioVenta = ?, stockDisponible = ?, stockMinimo = ? WHERE idRepuesto = ?";
+        // ELIMINAR idProveedor del UPDATE
+        String sql = "UPDATE Repuesto SET nombre = ?, descripcion = ?, costoUnitario = ?, precioVenta = ?, stockDisponible = ?, stockMinimo = ? WHERE idRepuesto = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setLong(1, repuesto.getIdProveedor());
-            pstmt.setString(2, repuesto.getNombre());
-            pstmt.setString(3, repuesto.getDescripcion());
-            pstmt.setBigDecimal(4, repuesto.getCostoUnitario());
-            pstmt.setBigDecimal(5, repuesto.getPrecioVenta());
-            pstmt.setInt(6, repuesto.getStockDisponible());
-            pstmt.setInt(7, repuesto.getStockMinimo());
-            pstmt.setLong(8, id);
+
+            pstmt.setString(1, repuesto.getNombre());
+            pstmt.setString(2, repuesto.getDescripcion());
+            pstmt.setBigDecimal(3, repuesto.getCostoUnitario());
+            pstmt.setBigDecimal(4, repuesto.getPrecioVenta());
+            pstmt.setInt(5, repuesto.getStockDisponible());
+            pstmt.setInt(6, repuesto.getStockMinimo());
+            pstmt.setLong(7, id);
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -97,6 +100,7 @@ public class RepuestoDAO {
         return null;
     }
 
+    // MÉTODO DELETE QUE FALTABA
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM Repuesto WHERE idRepuesto = ?";
 
@@ -104,17 +108,37 @@ public class RepuestoDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, id);
-            return pstmt.executeUpdate() > 0;
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
+    public boolean actualizarStock(Long idRepuesto, int cantidad) {
+        String sql = "UPDATE Repuesto SET stockDisponible = stockDisponible + ? WHERE idRepuesto = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, cantidad); // Si 'cantidad' es -1 para restar, entonces stockDisponible + (-1) = stockDisponible - 1
+            pstmt.setLong(2, idRepuesto);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ELIMINAR idProveedor del mapeo
     private Repuesto mapRowToRepuesto(ResultSet rs) throws SQLException {
         return new Repuesto(
                 rs.getLong("idRepuesto"),
-                rs.getLong("idProveedor"),
+                // ELIMINAR: rs.getLong("idProveedor"),
                 rs.getString("nombre"),
                 rs.getString("descripcion"),
                 rs.getBigDecimal("costoUnitario"),
